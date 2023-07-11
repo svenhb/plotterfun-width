@@ -6,3 +6,4 @@ Instead of drawing squiggles, the pen width will be modified.
 
 In GRBL-Plotter the pen-width can be translated to a Z or S value to change the hight / contact pressure of a paint brush, using the z-axis or a RC-Servo.
 
+Try out here: https://grbl-plotter.de/plotterfun-width/
