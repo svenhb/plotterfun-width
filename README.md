@@ -1,4 +1,4 @@
-# Plotterfun-width
+# Plotterfun 'pen-width'
 
 Modificated scripts from the original plotterfun: https://github.com/mitxela/plotterfun
 
