@@ -60,8 +60,8 @@
             <div id=imgselect>
                 <form>
                     Canvas
-                    W:<input id=pcw type=number min=10 value=800 oninput='changeSize()'>
-                    H:<input id=pch type=number min=10 value=600 oninput='changeSize()'>
+                    W:<input id=pcw type=number min=10 value=800 oninput='changeSize()'>px 
+                    H:<input id=pch type=number min=10 value=600 oninput='changeSize()'>px 
                 </form>
                 <canvas></canvas><br>
                 <button onclick='selectImage()'>Select image</button>
@@ -407,7 +407,7 @@
 				mainpath.setAttributeNS(null, "y1", att[1]) 
 				mainpath.setAttributeNS(null, "x2", att[2]) 
 				mainpath.setAttributeNS(null, "y2", att[3]) 
-				mainpath.setAttributeNS(null, "stroke-width", att[4]) 
+				mainpath.setAttributeNS(null, "stroke-width", att[4]+"mm") 
 				mainpath.setAttributeNS(null, "stroke", config.Inverted?"white":"black") 
 				svg.appendChild(mainpath)
 			} 
@@ -425,15 +425,15 @@
         svg.setAttribute("height",config.height)
         svg.setAttribute("viewBox", `0 0 ${config.width} ${config.height}`)
         svg.style.background=config.Inverted?"black":"white";
-   //     window.mainpath=document.createElementNS(svgNS, "path");
-//      mainpath.setAttributeNS(null, "style", "stroke-width: 2px; fill: none; stroke: " + (config.Inverted?"white":"black"))
-  //      mainpath.setAttributeNS(null, "style", "stroke:" + (config.Inverted?"white":"black")+";stroke-width:0.2mm;fill:none;")  // switched order
- //       svg.appendChild(mainpath)
+//     window.mainpath=document.createElementNS(svgNS, "path");
+//     mainpath.setAttributeNS(null, "style", "stroke-width: 2px; fill: none; stroke: " + (config.Inverted?"white":"black"))
+//     mainpath.setAttributeNS(null, "style", "stroke:" + (config.Inverted?"white":"black")+";stroke-width:0.2mm;fill:none;")  // switched order
+//     svg.appendChild(mainpath)
 		metadata=document.createElementNS(svgNS, "metadata");
 		rdf=document.createElementNS(rdfNS, "RDF");
 		work=document.createElementNS(ccNS, "Work");		
 		description = document.createElementNS(dcNS, "description");
-		text = "Generated with https://grbl-plotter.de/plotterfun-test/ \r\n";
+		text = "Generated with https://grbl-plotter.de/plotterfun-width/ \r\n";
 		text += "ZDown=-"+config['Pen width']+";"		
 		data = document.createTextNode(text);
 		

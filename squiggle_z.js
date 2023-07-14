@@ -3,7 +3,7 @@ importScripts('helpers.js')
 postMessage(['sliders', defaultControls.concat([
 	{label: 'Line Count', value: 50, min: 10, max: 200},
 	{label: 'Sampling', value: 1, min: 0.5, max: 2.9, step: 0.1},
-	{label: 'Pen width', value: 5, min: 0.1, max: 20, step: 1},
+	{label: 'Pen width', value: 1, min: 0.1, max: 5, step: 0.1},
 	{label: 'Z steps', value: 8, min: 2, max: 255, step: 4},
 	{label: 'Always start at x=0', type:'checkbox'},
 ])]);
@@ -34,9 +34,9 @@ onmessage = function(e) {
 				if (keep)
 					line.push([x, y, w]);
 			}
-			else if (w != oldW)
+			else if (w != oldW)					// remove to get all pixels
 			{
-				line.push([x-1, y, oldW]);
+				line.push([x-1, y, oldW]);		// remove to get all pixels
 				line.push([x, y, w]);				
 			}
 			oldW = w;
