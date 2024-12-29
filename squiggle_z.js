@@ -28,6 +28,8 @@ onmessage = function(e) {
 		oldW=0;
 		for (let x = 0; x <= config.width; x += incr_x) {
 			let z = getPixel(x, y)		// 0 to 255
+			if (isNaN(z))
+				z = 128;
 			let w = Math.round(z * step / 255) * pwidth / step;
 			if ((x==0) || (x == config.width))// || (w != oldW))
 			{	

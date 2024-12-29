@@ -26,6 +26,7 @@
             button:hover{background:#5d90bc !important;color:#fff}
             #tabbar button.active{background:#99afbf}
             #imgselect,#webcam {text-align:justify;text-align-last:justify}
+			#imgselect button{margin:0}
             #algoSelect{background:#d2e4f0;margin:5px 0;border:solid #5d90bc;border-width:2px 0 2px 0}
             a:hover{color:red}
             canvas{ /* checkerboard pattern */ 
@@ -51,7 +52,7 @@
         </style>
         <link rel=stylesheet href=range.css>
     </head>
-    <body id=body onload='preset("example_modell.png")'>
+    <body id=body onload='bodyOnLoad()'>
         <div id=sidebar>
             <h2>Plotterfun pen-width</h2>
             <div id=tabbar>
@@ -64,6 +65,7 @@
                     H:<input id=pch type=number min=10 value=600 oninput='changeSize()'>px 
                 </form>
                 <canvas></canvas><br>
+                <button onclick='pasteImage()'>Paste image</button>
                 <button onclick='selectImage()'>Select image</button>
                 <button onclick='useImage()'>Use image</button>
             </div>
@@ -121,6 +123,7 @@
           </div>
         </div>
     <svg></svg>
+ 	<p id="log"></p>
     <div id=msgbox></div>
 		<!-- a spacer gif -->
 		<img src="https://grbl-plotter.de/plugins/hitcount/ping/ping.php?from=plotterfun" />
@@ -144,6 +147,46 @@
     // "Animate" button
     // plot time estimate
 
+	function bodyOnLoad(){
+		log("Update 2024-12-29: <ul><li>Paste PNG from clipboard</li><li>Copy to clipboard in Inkscape format</li></ul>");
+		preset("example_modell.png");
+		//preset("test.jpg");
+	}
+
+	async function pasteImage() {
+	  try {
+		const clipboardContents = await navigator.clipboard.read();
+		for (const item of clipboardContents) {
+		  if (!item.types.includes("image/png")) {
+			throw new Error("Clipboard does not contain PNG image data.");
+		  }
+		  const blob = await item.getType("image/png");
+		  img = new Image();
+        img.onload=function(){
+            let w=img.width, h=img.height;
+
+            cw=parseInt(pcw.defaultValue) // reset size - worth it?
+
+            if (w>cw || h>ch) { ch=Math.round(cw*h/w) }
+            else if (w>10&&h>10){ch=h;cw=w}
+            preview.height = pch.value = ch 
+            preview.width = pcw.value = cw
+
+            scale = Math.min(ch/h, cw/w)
+            offset = [ cw/2, ch/2 ]
+            draw()
+            setTimeout(useImage, 500);
+        }
+		  img.src = URL.createObjectURL(blob);
+		}
+	  } catch (error) {
+		log(error.message);
+	  }
+	}	
+	const logElement = document.querySelector("#log");
+	function log(text) {
+	  logElement.innerHTML = text;
+	}	
 
     function checkScroll(){
         svg.style.position= (window.innerWidth < canvas.width+320 || window.innerHeight < canvas.height+10) ? "absolute" : "fixed";
@@ -407,6 +450,8 @@
 				mainpath.setAttributeNS(null, "y1", att[1]) 
 				mainpath.setAttributeNS(null, "x2", att[2]) 
 				mainpath.setAttributeNS(null, "y2", att[3]) 
+				if (att[4] == "NaN")
+					att[4] = "0.0";
 				mainpath.setAttributeNS(null, "stroke-width", att[4]+"mm") 
 				mainpath.setAttributeNS(null, "stroke", config.Inverted?"white":"black") 
 				svg.appendChild(mainpath)
@@ -460,11 +505,30 @@
         const svgString = '<?xml version="1.0" standalone="no"?>\r\n'	//<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\r\n'
         + (new XMLSerializer()).serializeToString(svg);
 
-        navigator.clipboard.writeText(svgString);
+        //navigator.clipboard.writeText(svgString);
+		copyCanvasContentsToClipboard(svgString);
 
         /* Copy the text inside the text field */  
-        set_GRBL_Plotter_Update();
+        //set_GRBL_Plotter_Update();
     }
+	
+	async function copyCanvasContentsToClipboard(text) {
+		const type = "image/svg+xml";	//"image/x-inkscape-svg";
+		if (ClipboardItem.supports(type)) {
+		// Copy canvas to blob
+			try {
+				const blob = new Blob([text], { type });
+				const data = [new ClipboardItem({ [type]: blob })];
+				await navigator.clipboard.write(data);
+				log("Copied");
+			} catch (error) {
+			log(error);
+			}
+		} else {
+		log(type + " is not supported");
+		}
+	}
+	
     // Accessing the registry does not work from normal HTML - paste code manually in GRBL-Plotter
     function set_GRBL_Plotter_Update()
     {	var WshShell = new ActiveXObject('WScript.Shell');
